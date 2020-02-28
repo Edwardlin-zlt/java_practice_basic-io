@@ -15,15 +15,29 @@ public class FileUtil {
      * 例如把a文件夹(a文件夹下有1.txt和一个空文件夹c)复制到b文件夹，复制完成以后b文件夹下也有一个1.txt和空文件夹c
      */
     public static void copyDirectory(File from, File to) throws IOException {
+        if (!to.mkdirs()) {
+            clearDir(to);
+        }
         File[] files = from.listFiles();
-        boolean isDirMade = to.mkdirs();
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
-                    copyDirectory(file, new File(to.getAbsolutePath()+File.separator+file.getName()));
+                    copyDirectory(file, new File(to.getAbsolutePath() + File.separator + file.getName()));
                 } else {
-                    copyFile(file, new File(to.getAbsolutePath()+File.separator+file.getName()));
+                    copyFile(file, new File(to.getAbsolutePath() + File.separator + file.getName()));
                 }
+            }
+        }
+    }
+
+    private static void clearDir(File to) {
+        File[] files = to.listFiles();
+        if (files == null) {
+            return;
+        }
+        for (File file : files) {
+            if (!file.delete()) {
+                clearDir(file);
             }
         }
     }
@@ -35,7 +49,7 @@ public class FileUtil {
 //        System.out.println(to.getAbsolutePath()+" Copied");
         byte[] bytes = new byte[1024];
         int len = 0;
-        while ((len = fromStream.read(bytes))!= -1) {
+        while ((len = fromStream.read(bytes)) != -1) {
             toStream.write(bytes, 0, len);
         }
         fromStream.close();
